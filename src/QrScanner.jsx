@@ -1,16 +1,17 @@
-import React, { useEffect } from "react";
+import { QrReader } from 'react-qr-reader';
 
-export default function QrScanner() {
-  useEffect(() => {
-    const scanner = new Html5QrcodeScanner("reader", {
-      fps: 10,
-      qrbox: 250,
-    });
-    scanner.render((decodedText) => {
-      console.log("QR Code scanned:", decodedText);
-      scanner.clear();
-    });
-  }, []);
-
-  return <div id="reader" className="w-full max-w-md" />;
+export default function QrScanner({ onResult }) {
+  return (
+    <div style={{ width: "100%" }}>
+      <QrReader
+        constraints={{ facingMode: 'environment' }}
+        onResult={(result, error) => {
+          if (!!result) {
+            onResult(result?.text); // QR kód szöveg visszaadása a szülő komponensnek
+          }
+        }}
+        style={{ width: '100%' }}
+      />
+    </div>
+  );
 }
