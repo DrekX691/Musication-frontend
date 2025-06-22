@@ -1,20 +1,15 @@
-import { useState } from 'react';
-import QrScanner from './QrScanner';
+import QrScanner from "./QrScanner";
 
 function App() {
-  const [scanned, setScanned] = useState('');
-
-  const handleQRScan = (text) => {
-    console.log("QR kód:", text);
-    setScanned(text);
-    // Ide jöhet a Spotify API hívás a beolvasott adatokkal
+  const handleScan = (url) => {
+    console.log("Beolvasott QR:", url);
+    // pl. indíthatod Spotify lejátszást, vagy állapotba teszed
   };
 
   return (
-    <div className="App">
-      <h1>QR kód beolvasó</h1>
-      <QrScanner onResult={handleQRScan} />
-      {scanned && <p>Beolvasott kód: {scanned}</p>}
+    <div className="bg-black text-white min-h-screen flex flex-col items-center justify-center">
+      <h1 className="text-xl font-bold mb-4">QR-kód beolvasó</h1>
+      <QrScanner onScan={handleScan} />
     </div>
   );
 }
