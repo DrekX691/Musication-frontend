@@ -5,32 +5,36 @@ export default function QrScanner({ onScan }) {
   const qrRef = useRef(null);
 
   useEffect(() => {
-    const qrCodeScanner = new Html5Qrcode(qrRef.current.id);
-
-    qrCodeScanner.start(
+    const scanner = new Html5Qrcode(qrRef.current.id);
+    scanner.start(
       { facingMode: "environment" },
       {
         fps: 10,
-        qrbox: 250,
+        qrbox: { width: 250, height: 250 },
       },
       (decodedText) => {
-        qrCodeScanner.stop().then(() => {
+        scanner.stop().then(() => {
           onScan(decodedText);
         });
       },
       (error) => {
-        console.warn("QR Scan error:", error);
+        // Hiba nem jelenik meg, csak naplóz
+        console.warn("QR hiba:", error);
       }
     );
 
     return () => {
-      qrCodeScanner.stop().catch(() => {});
+      scanner.stop().catch(() => {});
     };
   }, [onScan]);
 
   return (
-    <div className="w-full flex justify-center">
-      <div id="qr-reader" ref={qrRef} style={{ width: "100%" }} />
+    <div className="w-full flex justify-center items-center">
+      <div
+        id="qr-reader"
+        ref={qrRef}
+        className="w-[280px] h-[280px] rounded-md overflow-hidden shadow-md"
+      />
     </div>
   );
 }

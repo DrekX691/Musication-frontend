@@ -4,25 +4,46 @@ import { Html5QrcodeScanner } from "html5-qrcode";
 function QrScanner({ onScan }) {
   useEffect(() => {
     const scanner = new Html5QrcodeScanner(
-      "qr-reader", // Ez a div ID-ja
+      "qr-reader",
       {
-        fps: 10,      // képkocka/másodperc
-        qrbox: 250,   // QR-kódot kereső négyzet mérete (pixelben)
+        fps: 10,
+        qrbox: 250,
       },
-      false // verbose mód kikapcsolva
+      false
     );
 
-    // QR-kód beolvasás eseménykezelő
     scanner.render(
-      (decodedText, decodedResult) => {
-        onScan(decodedText); // továbbítja a leolvasott URL-t
+      (decodedText) => {
+        console.log("📷 QR kód beolvasva:", decodedText);
+
+        // 1. Frissítsük a szülő komponens állapotát
+        onScan(decodedText);
+
+        // 2. Küldjük el a backendre a Spotify URL-t
+        fetch("http://localhost:3001/api/play", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ url: decodedText }),
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            if (data.success) {
+              console.log("▶️ Zene elindítva!");
+            } else {
+              console.error("❌ Lejátszási hiba:", data.error);
+            }
+          })
+          .catch((err) => {
+            console.error("🌐 Hálózati hiba:", err);
+          });
       },
       (error) => {
-        // QR hibák ide jöhetnek (pl. nem található QR kód)
+        // ide jöhet pl. console.warn("QR hiba", error)
       }
     );
 
-    // komponens unmount-kor leállítja a scannert
     return () => {
       scanner.clear().catch((e) => console.error("QR leállítási hiba", e));
     };
